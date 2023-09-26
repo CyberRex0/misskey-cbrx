@@ -34,18 +34,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.termsOfService }}</template>
 				<template #suffix><i v-if="agreeTos" class="ti ti-check" style="color: var(--success)"></i></template>
 
-				<a :href="instance.tosUrl" class="_link" target="_blank">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a>
+				<a :href="instance.tosUrl" class="_link" target="_blank" @click="sT(()=>{agreeTosSwitchDisabled=false}, 1000 * 30)">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a>
 
-				<MkSwitch :modelValue="agreeTos" style="margin-top: 16px;" @update:modelValue="updateAgreeTos">{{ i18n.ts.agree }}</MkSwitch>
+				<MkSwitch :modelValue="agreeTos" style="margin-top: 16px;" @update:modelValue="updateAgreeTos" :disabled="agreeTosSwitchDisabled">{{ i18n.ts.agree }}</MkSwitch>
 			</MkFolder>
 
 			<MkFolder :defaultOpen="true">
 				<template #label>{{ i18n.ts.basicNotesBeforeCreateAccount }}</template>
 				<template #suffix><i v-if="agreeNote" class="ti ti-check" style="color: var(--success)"></i></template>
 
-				<a href="https://misskey-hub.net/docs/notes.html" class="_link" target="_blank">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
+				<a href="https://misskey-hub.net/docs/notes.html" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1000 * 15)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
 
-				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree @update:modelValue="updateAgreeNote">{{ i18n.ts.agree }}</MkSwitch>
+				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree @update:modelValue="updateAgreeNote" :disabled="basicNoteSwitchDisabled">{{ i18n.ts.agree }}</MkSwitch>
+			</MkFolder>
+
+			<MkFolder :defaultOpen="true">
+				<template #label>年齢確認</template>
+				<template #suffix><i v-if="iAmAbove13" class="ti ti-check" style="color: var(--success)"></i></template>
+				<MkSwitch :modelValue="iAmAbove13" @update:modelValue="updateiAmAbove13">私は13歳以上です</MkSwitch>
 			</MkFolder>
 
 			<div v-if="!agreed" style="text-align: center;">{{ i18n.ts.pleaseAgreeAllToContinue }}</div>
@@ -75,9 +81,15 @@ const availableTos = instance.tosUrl != null;
 const agreeServerRules = ref(false);
 const agreeTos = ref(false);
 const agreeNote = ref(false);
+const iAmAbove13 = ref(false);
+
+const sT = setTimeout;
+
+const agreeTosSwitchDisabled = ref(true);
+const basicNoteSwitchDisabled = ref(true);
 
 const agreed = computed(() => {
-	return (!availableServerRules || agreeServerRules.value) && (!availableTos || agreeTos.value) && agreeNote.value;
+	return (!availableServerRules || agreeServerRules.value) && (!availableTos || agreeTos.value) && agreeNote.value && iAmAbove13.value;
 });
 
 const emit = defineEmits<{
@@ -124,6 +136,20 @@ async function updateAgreeNote(v: boolean) {
 		agreeNote.value = true;
 	} else {
 		agreeNote.value = false;
+	}
+}
+
+async function updateiAmAbove13(v: boolean) {
+	if (v) {
+		const confirm = await os.confirm({
+			type: 'question',
+			title: '本当に13歳以上ですか？',
+			text: `もしあなたが13さいになっていないなら\n${instance.name}をつかうのはやめてください。\n<small>13歳未満であると判明した場合は凍結します。</small>`,
+		});
+		if (confirm.canceled) return;
+		iAmAbove13.value = true;
+	} else {
+		iAmAbove13.value = false;
 	}
 }
 </script>
