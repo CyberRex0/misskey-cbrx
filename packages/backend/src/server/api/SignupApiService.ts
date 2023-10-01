@@ -21,6 +21,7 @@ import { bindThis } from '@/decorators.js';
 import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
 import { SigninService } from './SigninService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
+import { ApiError } from './error.js';
 
 @Injectable()
 export class SignupApiService {
@@ -155,6 +156,21 @@ export class SignupApiService {
 			const isPreserved = instance.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
 			if (isPreserved) {
 				throw new FastifyReplyError(400, 'DENIED_USERNAME');
+			}
+
+			// 使えないメアドチェック (学校関係)
+			if (emailAddress!.match(/@.*\.(ed|ac|ednet)\.jp/)) {
+				//throw new FastifyReplyError(400, 'BLACKLISTED_EMAIL_DOMAIN_EDU');
+				throw new ApiError({
+					code: 'BLACKLISTED_EMAIL_DOMAIN_EDU',
+					message: '学校のメールアドレスで登録することはできません。',
+					id: '6bbc2095-6d05-416c-9870-48f714f30ee3',
+				});
+			}
+
+			// 使えないメアドチェック (その他)
+			if (emailAddress!.match(/@.*sute\.jp/)) {
+				throw new FastifyReplyError(400, 'BLACKLISTED_EMAIL_DOMAIN_2');
 			}
 
 			const code = secureRndstr(16, { chars: L_CHARS });

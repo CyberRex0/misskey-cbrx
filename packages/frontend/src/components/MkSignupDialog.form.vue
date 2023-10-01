@@ -241,6 +241,17 @@ function onChangePasswordRetype(): void {
 
 async function onSubmit(): Promise<void> {
 	if (submitting) return;
+
+	if (email) {
+		if (email.match(/@.*\.(ed|ac|ednet)\.jp/)) {
+			os.alert({
+				type: 'error',
+				text: '学校のメールアドレスで登録することはできません。',
+			});
+			return;
+		}
+	}
+
 	submitting = true;
 
 	try {
@@ -271,7 +282,7 @@ async function onSubmit(): Promise<void> {
 				return login(res.i);
 			}
 		}
-	} catch {
+	} catch (exc) {
 		submitting = false;
 		hcaptcha?.reset?.();
 		recaptcha?.reset?.();
