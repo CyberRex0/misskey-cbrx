@@ -294,7 +294,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				const minute = Number(s.slice(10, 12));
 				const second = Number(s.slice(12, 14));
 				createdAt.setUTCFullYear(year);
-				createdAt.setUTCMonth(month);
+				createdAt.setUTCMonth(month - 1);
 				createdAt.setUTCDate(day);
 				createdAt.setUTCHours(hour);
 				createdAt.setUTCMinutes(minute);
