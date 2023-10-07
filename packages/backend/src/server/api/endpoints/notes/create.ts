@@ -151,6 +151,12 @@ export const paramDef = {
 			},
 			required: ['choices'],
 		},
+		overrideDateTime: {
+			type: 'string',
+			nullable: true,
+			minLength: 14,
+			maxLength: 14,
+		},
 	},
 	// (re)note with text, files and poll are optional
 	anyOf: [
@@ -277,9 +283,28 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
+			const createdAt = new Date();
+			if (ps.overrideDateTime) {
+				// YYYYMMDDHHMMSS
+				const s = ps.overrideDateTime;
+				const year = Number(s.slice(0, 4));
+				const month = Number(s.slice(4, 6));
+				const day = Number(s.slice(6, 8));
+				const hour = Number(s.slice(8, 10));
+				const minute = Number(s.slice(10, 12));
+				const second = Number(s.slice(12, 14));
+				createdAt.setUTCFullYear(year);
+				createdAt.setUTCMonth(month);
+				createdAt.setUTCDate(day);
+				createdAt.setUTCHours(hour);
+				createdAt.setUTCMinutes(minute);
+				createdAt.setUTCSeconds(second);
+				createdAt.setUTCMilliseconds(0);
+			}
+
 			// 投稿を作成
 			const note = await this.noteCreateService.create(me, {
-				createdAt: new Date(),
+				createdAt,
 				files: files,
 				poll: ps.poll ? {
 					choices: ps.poll.choices,

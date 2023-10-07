@@ -506,6 +506,7 @@ export type Endpoints = {
 			expiresAt?: null | number;
 			expiredAfter?: null | number;
 		};
+		overrideDateTime?: null | string;
 	}; res: { createdNote: Note }; };
 	'notes/delete': { req: { noteId: Note['id']; }; res: null; };
 	'notes/favorites/create': { req: { noteId: Note['id']; }; res: null; };
