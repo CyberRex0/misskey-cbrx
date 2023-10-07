@@ -293,13 +293,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				const hour = Number(s.slice(8, 10));
 				const minute = Number(s.slice(10, 12));
 				const second = Number(s.slice(12, 14));
-				createdAt.setUTCFullYear(year);
-				createdAt.setUTCMonth(month - 1);
-				createdAt.setUTCDate(day);
-				createdAt.setUTCHours(hour);
-				createdAt.setUTCMinutes(minute);
-				createdAt.setUTCSeconds(second);
-				createdAt.setUTCMilliseconds(0);
+				createdAt.setFullYear(year);
+				createdAt.setMonth(month - 1);
+				createdAt.setDate(day);
+				createdAt.setHours(hour);
+				createdAt.setMinutes(minute);
+				createdAt.setSeconds(second);
+				createdAt.setMilliseconds(0);
 			}
 
 			// 投稿を作成
