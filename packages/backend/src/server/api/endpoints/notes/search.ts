@@ -31,6 +31,11 @@ export const meta = {
 			code: 'UNAVAILABLE',
 			id: '0b44998d-77aa-4427-80d0-d2c9b8523011',
 		},
+		noSuchNote: {
+			message: 'Query is empty.',
+			code: 'QUERY_IS_EMPTY',
+			id: 'd0410b51-f409-4667-8118-cfe999e453c3',
+		},
 	},
 } as const;
 
@@ -66,6 +71,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (!policies.canSearchNotes) {
 				throw new ApiError(meta.errors.unavailable);
 			}
+
+			if (ps.query.trim().length === 0) throw new ApiError(meta.errors.noSuchNote);
 
 			const notes = await this.searchService.searchNote(ps.query, me, {
 				userId: ps.userId,
