@@ -40,16 +40,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<a :href="instance.tosUrl" class="_link" target="_blank" @click="sT(()=>{agreeTosSwitchDisabled=false}, 1000 * 30)">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a>
 
-				<MkSwitch :modelValue="agreeTosAndPrivacyPolicy" style="margin-top: 16px;" @update:modelValue="updateAgreeTosAndPrivacyPolicy" :disabled="agreeTosSwitchDisabled">{{ i18n.ts.agree }}</MkSwitch>
+				<MkSwitch :modelValue="agreeTosAndPrivacyPolicy" style="margin-top: 16px;" :disabled="agreeTosSwitchDisabled" @update:modelValue="updateAgreeTosAndPrivacyPolicy">{{ i18n.ts.agree }}</MkSwitch>
 			</MkFolder>
 
 			<MkFolder :defaultOpen="true">
 				<template #label>{{ i18n.ts.basicNotesBeforeCreateAccount }}</template>
 				<template #suffix><i v-if="agreeNote" class="ti ti-check" style="color: var(--success)"></i></template>
 
-				<a href="https://misskey-hub.net/docs/notes.html" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1000 * 15)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
+				<a href="https://misskey-hub.net/docs/for-users/onboarding/warning/" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1000 * 15)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
 
-				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree @update:modelValue="updateAgreeNote" :disabled="basicNoteSwitchDisabled">{{ i18n.ts.agree }}</MkSwitch>
+				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree :disabled="basicNoteSwitchDisabled" @update:modelValue="updateAgreeNote">{{ i18n.ts.agree }}</MkSwitch>
 			</MkFolder>
 
 			<MkFolder :defaultOpen="true">
@@ -70,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import MkButton from '@/components/MkButton.vue';
@@ -110,7 +110,7 @@ const tosPrivacyPolicyLabel = computed(() => {
 	} else if (availablePrivacyPolicy) {
 		return i18n.ts.privacyPolicy;
 	} else {
-		return "";
+		return '';
 	}
 });
 
