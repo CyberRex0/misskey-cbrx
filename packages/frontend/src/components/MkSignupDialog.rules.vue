@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ tosPrivacyPolicyLabel }}</template>
 				<template #suffix><i v-if="agreeTosAndPrivacyPolicy" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 				<div class="_gaps_s">
-					<div v-if="availableTos"><a :href="instance.tosUrl ?? undefined" class="_link" target="_blank" @click="sT(()=>{agreeTosSwitchDisabled=false}, 1000 * 30)">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a></div>
+					<div v-if="availableTos"><a :href="instance.tosUrl ?? undefined" class="_link" target="_blank" @click="sT(()=>{agreeTosSwitchDisabled=false}, 1)">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a></div>
 					<div v-if="availablePrivacyPolicy"><a :href="instance.privacyPolicyUrl ?? undefined" class="_link" target="_blank">{{ i18n.ts.privacyPolicy }} <i class="ti ti-external-link"></i></a></div>
 				</div>
 
@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.basicNotesBeforeCreateAccount }}</template>
 				<template #suffix><i v-if="agreeNote" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 
-				<a href="https://misskey-hub.net/docs/for-users/onboarding/warning/" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1000 * 15)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
+				<a href="https://misskey-hub.net/docs/for-users/onboarding/warning/" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
 
 				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree :disabled="basicNoteSwitchDisabled" @update:modelValue="updateAgreeNote">{{ i18n.ts.agree }}</MkSwitch>
 			</MkFolder>
@@ -163,7 +163,7 @@ async function updateiAmAbove13(v: boolean) {
 		const confirm = await os.confirm({
 			type: 'question',
 			title: '本当に13歳以上ですか？',
-			text: `もしあなたが13さいになっていないなら\n${instance.name}をつかうのはやめてください。\n<small>13歳未満であると判明した場合は凍結します。</small>`,
+			text: `もしあなたが13さいになっていないなら\nこのサイトはつかわないでください。\n<small>13歳未満であると判明した場合は凍結します。</small>`,
 		});
 		if (confirm.canceled) return;
 		iAmAbove13.value = true;
