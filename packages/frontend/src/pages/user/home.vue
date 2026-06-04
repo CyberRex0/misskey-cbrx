@@ -87,7 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
 							</MkOmit>
 						</div>
-						<div v-if="$i" class="aiSummary">
+						<div v-if="canUseAiSummary" class="aiSummary">
 							<MkButton rounded gradate inline class="summaryButton" :wait="aiSummaryLoading" :disabled="aiSummaryLoading" @click="summarizeUser">
 								<i class="ti ti-sparkles"></i> {{ aiSummaryLoading ? i18n.ts.aiSummaryRequesting : i18n.ts.aiSummary }}
 							</MkButton>
@@ -241,6 +241,7 @@ const aiSummaryLoading = ref(false);
 const aiSummaryText = ref<string | null>(null);
 const aiSummaryUnavailable = ref(false);
 let aiSummaryPollingTimer: number | null = null;
+const canUseAiSummary = computed(() => $i != null);
 
 type AiSummaryResponse = {
 	status: 'idle' | 'ready' | 'queued' | 'processing' | 'unavailable' | 'failed';
@@ -296,7 +297,7 @@ async function updateMemo() {
 }
 
 async function summarizeUser() {
-	if (aiSummaryLoading.value) return;
+	if (!canUseAiSummary.value || aiSummaryLoading.value) return;
 	aiSummaryLoading.value = true;
 	aiSummaryText.value = null;
 	aiSummaryUnavailable.value = false;
@@ -319,7 +320,10 @@ async function summarizeUser() {
 }
 
 async function checkAiSummaryStatus() {
-	if (!$i) return;
+	if (!canUseAiSummary.value) {
+		resetAiSummaryState();
+		return;
+	}
 
 	try {
 		const result = await misskeyApi('users/ai-summary/status', {
@@ -334,6 +338,11 @@ async function checkAiSummaryStatus() {
 }
 
 async function pollAiSummaryStatus() {
+	if (!canUseAiSummary.value) {
+		resetAiSummaryState();
+		return;
+	}
+
 	try {
 		const result = await misskeyApi('users/ai-summary/status', {
 			userId: props.user.id,
@@ -402,15 +411,19 @@ function stopAiSummaryPolling() {
 	}
 }
 
+function resetAiSummaryState() {
+	stopAiSummaryPolling();
+	aiSummaryLoading.value = false;
+	aiSummaryText.value = null;
+	aiSummaryUnavailable.value = false;
+}
+
 watch([props.user], () => {
 	memoDraft.value = props.user.memo;
 });
 
 watch(() => props.user.id, () => {
-	stopAiSummaryPolling();
-	aiSummaryLoading.value = false;
-	aiSummaryText.value = null;
-	aiSummaryUnavailable.value = false;
+	resetAiSummaryState();
 	checkAiSummaryStatus();
 });
 
