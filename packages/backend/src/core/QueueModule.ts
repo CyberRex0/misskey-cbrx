@@ -17,6 +17,7 @@ import {
 	UserWebhookDeliverJobData,
 	SystemWebhookDeliverJobData,
 	PostScheduledNoteJobData,
+	UserAiSummaryJobData,
 } from '../queue/types.js';
 import type { Provider } from '@nestjs/common';
 
@@ -30,6 +31,7 @@ export type RelationshipQueue = Bull.Queue<RelationshipJobData>;
 export type ObjectStorageQueue = Bull.Queue;
 export type UserWebhookDeliverQueue = Bull.Queue<UserWebhookDeliverJobData>;
 export type SystemWebhookDeliverQueue = Bull.Queue<SystemWebhookDeliverJobData>;
+export type UserAiSummaryQueue = Bull.Queue<UserAiSummaryJobData>;
 
 const $system: Provider = {
 	provide: 'queue:system',
@@ -91,6 +93,12 @@ const $systemWebhookDeliver: Provider = {
 	inject: [DI.config],
 };
 
+const $userAiSummary: Provider = {
+	provide: 'queue:userAiSummary',
+	useFactory: (config: Config) => new Bull.Queue(QUEUE.USER_AI_SUMMARY, baseQueueOptions(config, QUEUE.USER_AI_SUMMARY)),
+	inject: [DI.config],
+};
+
 @Module({
 	imports: [
 	],
@@ -105,6 +113,7 @@ const $systemWebhookDeliver: Provider = {
 		$objectStorage,
 		$userWebhookDeliver,
 		$systemWebhookDeliver,
+		$userAiSummary,
 	],
 	exports: [
 		$system,
@@ -117,6 +126,7 @@ const $systemWebhookDeliver: Provider = {
 		$objectStorage,
 		$userWebhookDeliver,
 		$systemWebhookDeliver,
+		$userAiSummary,
 	],
 })
 export class QueueModule implements OnApplicationShutdown {
@@ -131,6 +141,7 @@ export class QueueModule implements OnApplicationShutdown {
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
+		@Inject('queue:userAiSummary') public userAiSummaryQueue: UserAiSummaryQueue,
 	) {}
 
 	public async dispose(): Promise<void> {
@@ -148,6 +159,7 @@ export class QueueModule implements OnApplicationShutdown {
 			this.objectStorageQueue.close(),
 			this.userWebhookDeliverQueue.close(),
 			this.systemWebhookDeliverQueue.close(),
+			this.userAiSummaryQueue.close(),
 		]);
 	}
 

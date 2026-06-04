@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { QueueService } from '@/core/QueueService.js';
 import { UserAiSummaryService } from '@/core/UserAiSummaryService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApiError } from '@/server/api/error.js';
@@ -32,11 +30,6 @@ export const meta = {
 			code: 'NO_SUCH_USER',
 			id: '4999936a-0726-4c8c-b8fb-76a66e103d66',
 		},
-		queueUnavailable: {
-			message: 'AI summary queue is unavailable.',
-			code: 'AI_SUMMARY_QUEUE_UNAVAILABLE',
-			id: '13102c80-659a-4f4d-a05b-59642b88622b',
-		},
 	},
 } as const;
 
@@ -52,40 +45,13 @@ export const paramDef = {
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
 		private userAiSummaryService: UserAiSummaryService,
-		private queueService: QueueService,
 	) {
 		super(meta, paramDef, async (ps) => {
 			if (!await this.userAiSummaryService.userExists(ps.userId)) {
 				throw new ApiError(meta.errors.noSuchUser);
 			}
 
-			const status = await this.userAiSummaryService.getStatus(ps.userId);
-			if (status.status === 'ready' || status.status === 'queued' || status.status === 'processing' || status.status === 'unavailable') {
-				return status;
-			}
-
-			if (status.status === 'failed') {
-				await this.userAiSummaryService.clearFailedState(ps.userId);
-			}
-
-			const jobId = randomUUID();
-			const reserved = await this.userAiSummaryService.reserveJob(ps.userId, jobId);
-			if (!reserved) {
-				return await this.userAiSummaryService.getStatus(ps.userId);
-			}
-
-			try {
-				await this.queueService.createUserAiSummaryJob(ps.userId, jobId);
-			} catch {
-				await this.userAiSummaryService.releaseReservation(ps.userId, jobId);
-				throw new ApiError(meta.errors.queueUnavailable);
-			}
-
-			return {
-				status: 'queued' as const,
-				summary: null,
-				cached: false,
-			};
+			return await this.userAiSummaryService.getStatus(ps.userId);
 		});
 	}
 }

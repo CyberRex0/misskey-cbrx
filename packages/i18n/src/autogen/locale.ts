@@ -145,6 +145,10 @@ export interface Locale extends ILocale {
      */
     "aiSummaryGenerating": string;
     /**
+     * 要約リクエスト中
+     */
+    "aiSummaryRequesting": string;
+    /**
      * 現在要約は利用できません
      */
     "aiSummaryUnavailable": string;

@@ -36,6 +36,7 @@ import { ExportFavoritesProcessorService } from './processors/ExportFavoritesPro
 import { CleanRemoteFilesProcessorService } from './processors/CleanRemoteFilesProcessorService.js';
 import { DeleteFileProcessorService } from './processors/DeleteFileProcessorService.js';
 import { RelationshipProcessorService } from './processors/RelationshipProcessorService.js';
+import { UserAiSummaryProcessorService } from './processors/UserAiSummaryProcessorService.js';
 import { TickChartsProcessorService } from './processors/TickChartsProcessorService.js';
 import { ResyncChartsProcessorService } from './processors/ResyncChartsProcessorService.js';
 import { CleanChartsProcessorService } from './processors/CleanChartsProcessorService.js';
@@ -86,6 +87,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	private objectStorageQueueWorker: Bull.Worker;
 	private endedPollNotificationQueueWorker: Bull.Worker;
 	private postScheduledNoteQueueWorker: Bull.Worker;
+	private userAiSummaryQueueWorker: Bull.Worker;
 
 	constructor(
 		@Inject(DI.config)
@@ -118,6 +120,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private deleteFileProcessorService: DeleteFileProcessorService,
 		private cleanRemoteFilesProcessorService: CleanRemoteFilesProcessorService,
 		private relationshipProcessorService: RelationshipProcessorService,
+		private userAiSummaryProcessorService: UserAiSummaryProcessorService,
 		private tickChartsProcessorService: TickChartsProcessorService,
 		private resyncChartsProcessorService: ResyncChartsProcessorService,
 		private cleanChartsProcessorService: CleanChartsProcessorService,
@@ -515,6 +518,39 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		}
 		//#endregion
 
+		//#region user ai summary
+		{
+			this.userAiSummaryQueueWorker = new Bull.Worker(QUEUE.USER_AI_SUMMARY, (job) => {
+				if (Sentry != null) {
+					return Sentry.startSpan({ name: 'Queue: UserAiSummary' }, () => this.userAiSummaryProcessorService.process(job));
+				} else {
+					return this.userAiSummaryProcessorService.process(job);
+				}
+			}, {
+				...baseWorkerOptions(this.config, QUEUE.USER_AI_SUMMARY),
+				autorun: false,
+				concurrency: 1,
+			});
+
+			const logger = this.logger.createSubLogger('user-ai-summary');
+
+			this.userAiSummaryQueueWorker
+				.on('active', (job) => logger.debug(`active id=${job.id}`))
+				.on('completed', (job, result) => logger.debug(`completed(${result}) id=${job.id}`))
+				.on('failed', (job, err) => {
+					logger.error(`failed(${err.name}: ${err.message}) id=${job?.id ?? '?'}`, { job: renderJob(job), e: renderError(err) });
+					if (Sentry != null) {
+						Sentry.captureMessage(`Queue: UserAiSummary: ${err.name}: ${err.message}`, {
+							level: 'error',
+							extra: { job, err },
+						});
+					}
+				})
+				.on('error', (err: Error) => logger.error(`error ${err.name}: ${err.message}`, { e: renderError(err) }))
+				.on('stalled', (jobId) => logger.warn(`stalled id=${jobId}`));
+		}
+		//#endregion
+
 		//#region ended poll notification
 		{
 			this.endedPollNotificationQueueWorker = new Bull.Worker(QUEUE.ENDED_POLL_NOTIFICATION, (job) => {
@@ -559,6 +595,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.objectStorageQueueWorker.run(),
 			this.endedPollNotificationQueueWorker.run(),
 			this.postScheduledNoteQueueWorker.run(),
+			this.userAiSummaryQueueWorker.run(),
 		]);
 	}
 
@@ -575,6 +612,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.objectStorageQueueWorker.close(),
 			this.endedPollNotificationQueueWorker.close(),
 			this.postScheduledNoteQueueWorker.close(),
+			this.userAiSummaryQueueWorker.close(),
 		]);
 	}
 

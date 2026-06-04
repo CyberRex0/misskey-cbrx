@@ -8,6 +8,7 @@ process.env.NODE_ENV = 'test';
 import { describe, test, expect } from 'vitest';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
 import { paramDef } from './ai-summary.js';
+import { paramDef as statusParamDef } from './ai-summary/status.js';
 
 const VALID = true;
 const INVALID = false;
@@ -15,6 +16,16 @@ const INVALID = false;
 describe('api:users/ai-summary', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
+
+		test('Reject empty', () => expect(v({})).toBe(INVALID));
+		test('Reject non-string userId', () => expect(v({ userId: 1 })).toBe(INVALID));
+		test('Accept userId', () => expect(v({ userId: '1' })).toBe(VALID));
+	});
+});
+
+describe('api:users/ai-summary/status', () => {
+	describe('validation', () => {
+		const v = getValidator(statusParamDef);
 
 		test('Reject empty', () => expect(v({})).toBe(INVALID));
 		test('Reject non-string userId', () => expect(v({ userId: 1 })).toBe(INVALID));

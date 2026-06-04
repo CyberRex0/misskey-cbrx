@@ -88,8 +88,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkOmit>
 						</div>
 						<div v-if="$i" class="aiSummary">
-							<MkButton rounded gradate inline class="summaryButton" :wait="aiSummaryLoading" @click="summarizeUser">
-								<i class="ti ti-sparkles"></i> {{ aiSummaryLoading ? i18n.ts.aiSummaryGenerating : i18n.ts.aiSummary }}
+							<MkButton rounded gradate inline class="summaryButton" :wait="aiSummaryLoading" :disabled="aiSummaryLoading" @click="summarizeUser">
+								<i class="ti ti-sparkles"></i> {{ aiSummaryLoading ? i18n.ts.aiSummaryRequesting : i18n.ts.aiSummary }}
 							</MkButton>
 							<div v-if="aiSummaryText != null" class="summaryResult">{{ aiSummaryText }}</div>
 							<div v-else-if="aiSummaryUnavailable" class="summaryResult unavailable">{{ i18n.ts.aiSummaryUnavailable }}</div>
@@ -240,6 +240,13 @@ const editModerationNote = ref(false);
 const aiSummaryLoading = ref(false);
 const aiSummaryText = ref<string | null>(null);
 const aiSummaryUnavailable = ref(false);
+let aiSummaryPollingTimer: number | null = null;
+
+type AiSummaryResponse = {
+	status: 'idle' | 'ready' | 'queued' | 'processing' | 'unavailable' | 'failed';
+	summary: string | null;
+	cached: boolean;
+};
 
 watch(moderationNote, async () => {
 	await misskeyApi('admin/update-user-note', { userId: props.user.id, text: moderationNote.value });
@@ -297,21 +304,101 @@ async function summarizeUser() {
 	try {
 		const result = await misskeyApi('users/ai-summary', {
 			userId: props.user.id,
-		});
+		}) as AiSummaryResponse;
 
-		if (result.unavailable || result.summary == null) {
-			aiSummaryUnavailable.value = true;
-		} else {
-			aiSummaryText.value = result.summary;
-		}
+		await applyAiSummaryResult(result, true);
 	} catch {
+		stopAiSummaryPolling();
+		aiSummaryLoading.value = false;
 		await os.alert({
 			type: 'error',
 			title: i18n.ts.error,
 			text: i18n.ts.aiSummaryFailed,
 		});
-	} finally {
+	}
+}
+
+async function checkAiSummaryStatus() {
+	if (!$i) return;
+
+	try {
+		const result = await misskeyApi('users/ai-summary/status', {
+			userId: props.user.id,
+		}) as AiSummaryResponse;
+
+		await applyAiSummaryResult(result, false);
+	} catch {
+		stopAiSummaryPolling();
 		aiSummaryLoading.value = false;
+	}
+}
+
+async function pollAiSummaryStatus() {
+	try {
+		const result = await misskeyApi('users/ai-summary/status', {
+			userId: props.user.id,
+		}) as AiSummaryResponse;
+
+		await applyAiSummaryResult(result, true);
+	} catch {
+		stopAiSummaryPolling();
+		aiSummaryLoading.value = false;
+		await os.alert({
+			type: 'error',
+			title: i18n.ts.error,
+			text: i18n.ts.aiSummaryFailed,
+		});
+	}
+}
+
+async function applyAiSummaryResult(result: AiSummaryResponse, showFailureDialog: boolean) {
+	if (result.status === 'queued' || result.status === 'processing') {
+		aiSummaryLoading.value = true;
+		aiSummaryText.value = null;
+		aiSummaryUnavailable.value = false;
+		startAiSummaryPolling();
+		return;
+	}
+
+	stopAiSummaryPolling();
+	aiSummaryLoading.value = false;
+
+	if (result.status === 'ready' && result.summary != null) {
+		aiSummaryText.value = result.summary;
+		aiSummaryUnavailable.value = false;
+		return;
+	}
+
+	if (result.status === 'unavailable') {
+		aiSummaryText.value = null;
+		aiSummaryUnavailable.value = true;
+		return;
+	}
+
+	aiSummaryText.value = null;
+	aiSummaryUnavailable.value = false;
+
+	if (result.status === 'failed' && showFailureDialog) {
+		await os.alert({
+			type: 'error',
+			title: i18n.ts.error,
+			text: i18n.ts.aiSummaryFailed,
+		});
+	}
+}
+
+function startAiSummaryPolling() {
+	stopAiSummaryPolling();
+	aiSummaryPollingTimer = window.setTimeout(() => {
+		aiSummaryPollingTimer = null;
+		pollAiSummaryStatus();
+	}, 5000);
+}
+
+function stopAiSummaryPolling() {
+	if (aiSummaryPollingTimer != null) {
+		window.clearTimeout(aiSummaryPollingTimer);
+		aiSummaryPollingTimer = null;
 	}
 }
 
@@ -320,8 +407,11 @@ watch([props.user], () => {
 });
 
 watch(() => props.user.id, () => {
+	stopAiSummaryPolling();
+	aiSummaryLoading.value = false;
 	aiSummaryText.value = null;
 	aiSummaryUnavailable.value = false;
+	checkAiSummaryStatus();
 });
 
 async function reload() {
@@ -374,6 +464,7 @@ onMounted(() => {
 	});
 
 	initCalcBannerParallax();
+	checkAiSummaryStatus();
 });
 
 onActivated(() => {
@@ -381,10 +472,17 @@ onActivated(() => {
 		calcBannerParallax();
 		initCalcBannerParallax();
 	}
+	checkAiSummaryStatus();
 });
 
-onUnmounted(disposeBannerParallaxResizeObserver);
-onDeactivated(disposeBannerParallaxResizeObserver);
+onUnmounted(() => {
+	stopAiSummaryPolling();
+	disposeBannerParallaxResizeObserver();
+});
+onDeactivated(() => {
+	stopAiSummaryPolling();
+	disposeBannerParallaxResizeObserver();
+});
 </script>
 
 <style lang="scss" scoped>

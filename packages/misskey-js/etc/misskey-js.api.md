@@ -2130,6 +2130,8 @@ declare namespace entities {
         UsersAchievementsResponse,
         UsersAiSummaryRequest,
         UsersAiSummaryResponse,
+        UsersAiSummaryStatusRequest,
+        UsersAiSummaryStatusResponse,
         UsersClipsRequest,
         UsersClipsResponse,
         UsersFeaturedNotesRequest,
@@ -3389,7 +3391,7 @@ type QueueStats = {
 type QueueStatsLog = QueueStats[];
 
 // @public (undocumented)
-export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver"];
+export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver", "userAiSummary"];
 
 // @public (undocumented)
 type RenoteMuteCreateRequest = operations['renote-mute___create']['requestBody']['content']['application/json'];
@@ -3734,6 +3736,12 @@ type UsersAiSummaryRequest = operations['users___ai-summary']['requestBody']['co
 
 // @public (undocumented)
 type UsersAiSummaryResponse = operations['users___ai-summary']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type UsersAiSummaryStatusRequest = operations['users___ai-summary___status']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersAiSummaryStatusResponse = operations['users___ai-summary___status']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersClipsRequest = operations['users___clips']['requestBody']['content']['application/json'];

@@ -243,6 +243,7 @@ export const queueTypes = [
 	'objectStorage',
 	'userWebhookDeliver',
 	'systemWebhookDeliver',
+	'userAiSummary',
 ] as const;
 
 // See: packages/backend/src/core/ReversiService.ts@L410

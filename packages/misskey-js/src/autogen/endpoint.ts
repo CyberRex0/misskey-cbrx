@@ -608,6 +608,8 @@ import type {
 	UsersAchievementsResponse,
 	UsersAiSummaryRequest,
 	UsersAiSummaryResponse,
+	UsersAiSummaryStatusRequest,
+	UsersAiSummaryStatusResponse,
 	UsersClipsRequest,
 	UsersClipsResponse,
 	UsersFeaturedNotesRequest,
@@ -1069,6 +1071,7 @@ export type Endpoints = {
 	'users': { req: UsersRequest; res: UsersResponse };
 	'users/achievements': { req: UsersAchievementsRequest; res: UsersAchievementsResponse };
 	'users/ai-summary': { req: UsersAiSummaryRequest; res: UsersAiSummaryResponse };
+	'users/ai-summary/status': { req: UsersAiSummaryStatusRequest; res: UsersAiSummaryStatusResponse };
 	'users/clips': { req: UsersClipsRequest; res: UsersClipsResponse };
 	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
