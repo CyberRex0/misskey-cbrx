@@ -137,6 +137,22 @@ export interface Locale extends ILocale {
      */
     "noAccountDescription": string;
     /**
+     * AIで要約
+     */
+    "aiSummary": string;
+    /**
+     * 要約しています
+     */
+    "aiSummaryGenerating": string;
+    /**
+     * 現在要約は利用できません
+     */
+    "aiSummaryUnavailable": string;
+    /**
+     * 要約の取得に失敗しました
+     */
+    "aiSummaryFailed": string;
+    /**
      * ログイン
      */
     "login": string;

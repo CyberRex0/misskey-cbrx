@@ -87,6 +87,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
 							</MkOmit>
 						</div>
+						<div v-if="$i" class="aiSummary">
+							<MkButton rounded gradate inline class="summaryButton" :wait="aiSummaryLoading" @click="summarizeUser">
+								<i class="ti ti-sparkles"></i> {{ aiSummaryLoading ? i18n.ts.aiSummaryGenerating : i18n.ts.aiSummary }}
+							</MkButton>
+							<div v-if="aiSummaryText != null" class="summaryResult">{{ aiSummaryText }}</div>
+							<div v-else-if="aiSummaryUnavailable" class="summaryResult unavailable">{{ i18n.ts.aiSummaryUnavailable }}</div>
+						</div>
 						<div class="fields system">
 							<dl v-if="user.location" class="field">
 								<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
@@ -230,6 +237,9 @@ const memoDraft = ref(props.user.memo);
 const isEditingMemo = ref(false);
 const moderationNote = ref(props.user.moderationNote ?? '');
 const editModerationNote = ref(false);
+const aiSummaryLoading = ref(false);
+const aiSummaryText = ref<string | null>(null);
+const aiSummaryUnavailable = ref(false);
 
 watch(moderationNote, async () => {
 	await misskeyApi('admin/update-user-note', { userId: props.user.id, text: moderationNote.value });
@@ -278,8 +288,40 @@ async function updateMemo() {
 	isEditingMemo.value = false;
 }
 
+async function summarizeUser() {
+	if (aiSummaryLoading.value) return;
+	aiSummaryLoading.value = true;
+	aiSummaryText.value = null;
+	aiSummaryUnavailable.value = false;
+
+	try {
+		const result = await misskeyApi('users/ai-summary', {
+			userId: props.user.id,
+		});
+
+		if (result.unavailable || result.summary == null) {
+			aiSummaryUnavailable.value = true;
+		} else {
+			aiSummaryText.value = result.summary;
+		}
+	} catch {
+		await os.alert({
+			type: 'error',
+			title: i18n.ts.error,
+			text: i18n.ts.aiSummaryFailed,
+		});
+	} finally {
+		aiSummaryLoading.value = false;
+	}
+}
+
 watch([props.user], () => {
 	memoDraft.value = props.user.memo;
+});
+
+watch(() => props.user.id, () => {
+	aiSummaryText.value = null;
+	aiSummaryUnavailable.value = false;
 });
 
 async function reload() {
@@ -563,12 +605,39 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 				}
 
 				> .description {
-					padding: 24px 24px 24px 154px;
+					padding: 24px 24px 16px 154px;
 					font-size: 0.95em;
 
 					> .empty {
 						margin: 0;
 						opacity: 0.5;
+					}
+				}
+
+				> .aiSummary {
+					padding: 0 24px 24px 154px;
+					font-size: 0.95em;
+
+					> .summaryButton {
+						background: linear-gradient(90deg, #7c3aed, #c026d3) !important;
+						color: #fff !important;
+
+						&:not(:disabled):hover {
+							background: linear-gradient(90deg, #8b5cf6, #d946ef) !important;
+						}
+					}
+
+					> .summaryResult {
+						margin-top: 12px;
+						padding: 12px;
+						border: solid 1px color(from var(--MI_THEME-accent) srgb r g b / 0.35);
+						border-radius: 8px;
+						background: color-mix(in srgb, var(--MI_THEME-accent), transparent 92%);
+						line-height: 1.7;
+
+						&.unavailable {
+							opacity: 0.75;
+						}
 					}
 				}
 
@@ -711,8 +780,17 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 				}
 
 				> .description {
-					padding: 16px;
+					padding: 16px 16px 12px 16px;
 					text-align: center;
+				}
+
+				> .aiSummary {
+					padding: 0 16px 16px 16px;
+					text-align: center;
+
+					> .summaryResult {
+						text-align: left;
+					}
 				}
 
 				> .fields {

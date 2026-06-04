@@ -2128,6 +2128,8 @@ declare namespace entities {
         UsersResponse,
         UsersAchievementsRequest,
         UsersAchievementsResponse,
+        UsersAiSummaryRequest,
+        UsersAiSummaryResponse,
         UsersClipsRequest,
         UsersClipsResponse,
         UsersFeaturedNotesRequest,
@@ -3726,6 +3728,12 @@ type UsersAchievementsRequest = operations['users___achievements']['requestBody'
 
 // @public (undocumented)
 type UsersAchievementsResponse = operations['users___achievements']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type UsersAiSummaryRequest = operations['users___ai-summary']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersAiSummaryResponse = operations['users___ai-summary']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersClipsRequest = operations['users___clips']['requestBody']['content']['application/json'];

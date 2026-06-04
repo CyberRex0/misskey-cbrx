@@ -64,6 +64,10 @@ type Source = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	};
+	ollama?: {
+		endpoint: string;
+		model: string;
+	};
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
 	sentryForFrontend?: {
 		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
@@ -152,6 +156,10 @@ export type Config = {
 		ssl?: boolean;
 		index: string;
 		scope?: 'local' | 'global' | string[];
+	} | undefined;
+	ollama: {
+		endpoint: string;
+		model: string;
 	} | undefined;
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
@@ -301,6 +309,7 @@ export function loadConfig(): Config {
 		dbSlaves: config.dbSlaves,
 		fulltextSearch: config.fulltextSearch,
 		meilisearch: config.meilisearch,
+		ollama: config.ollama,
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForJobQueue: config.redisForJobQueue ? convertRedisOptions(config.redisForJobQueue, host) : redis,

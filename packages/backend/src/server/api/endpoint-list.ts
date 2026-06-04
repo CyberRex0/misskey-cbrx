@@ -387,6 +387,7 @@ export * as 'test' from './endpoints/test.js';
 export * as 'username/available' from './endpoints/username/available.js';
 export * as 'users' from './endpoints/users.js';
 export * as 'users/achievements' from './endpoints/users/achievements.js';
+export * as 'users/ai-summary' from './endpoints/users/ai-summary.js';
 export * as 'users/clips' from './endpoints/users/clips.js';
 export * as 'users/featured-notes' from './endpoints/users/featured-notes.js';
 export * as 'users/flashs' from './endpoints/users/flashs.js';

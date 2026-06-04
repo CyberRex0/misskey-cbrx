@@ -606,6 +606,8 @@ import type {
 	UsersResponse,
 	UsersAchievementsRequest,
 	UsersAchievementsResponse,
+	UsersAiSummaryRequest,
+	UsersAiSummaryResponse,
 	UsersClipsRequest,
 	UsersClipsResponse,
 	UsersFeaturedNotesRequest,
@@ -1066,6 +1068,7 @@ export type Endpoints = {
 	'username/available': { req: UsernameAvailableRequest; res: UsernameAvailableResponse };
 	'users': { req: UsersRequest; res: UsersResponse };
 	'users/achievements': { req: UsersAchievementsRequest; res: UsersAchievementsResponse };
+	'users/ai-summary': { req: UsersAiSummaryRequest; res: UsersAiSummaryResponse };
 	'users/clips': { req: UsersClipsRequest; res: UsersClipsResponse };
 	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };

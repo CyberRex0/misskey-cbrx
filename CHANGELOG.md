@@ -1,3 +1,15 @@
+## Unreleased
+
+### General
+-
+
+### Client
+- Feat: ユーザーの公開投稿をAIで要約できる機能を追加
+
+### Server
+-
+
+
 ## 2026.5.4
 
 ### General
