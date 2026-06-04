@@ -402,3 +402,8 @@ proxyBypassHosts:
 #     # Disable query truncation. If set to true, the full text of the query will be output to the log.
 #     # default: false
 #     disableQueryTruncation: false
+
+# Ollama API Settings
+#ollama:
+#  endpoint: http://localhost:11434
+#  model: gemma4:e2b
