@@ -385,6 +385,10 @@ export interface Locale extends ILocale {
      */
     "followers": string;
     /**
+     * 共通のフォロワー
+     */
+    "commonFollowers": string;
+    /**
      * フォローされています
      */
     "followsYou": string;

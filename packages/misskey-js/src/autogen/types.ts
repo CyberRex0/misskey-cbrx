@@ -3708,6 +3708,15 @@ export type paths = {
          */
         post: operations['users___clips'];
     };
+    '/users/common-followers': {
+        /**
+         * users/common-followers
+         * @description Show users that follow this user and are followed by the current user.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:following*
+         */
+        post: operations['users___common-followers'];
+    };
     '/users/featured-notes': {
         /**
          * users/featured-notes
@@ -29523,6 +29532,7 @@ export interface operations {
                         expiresAt?: number | null;
                         expiredAfter?: number | null;
                     } | null;
+                    overrideDateTime?: string | null;
                 };
             };
         };
@@ -34866,6 +34876,85 @@ export interface operations {
                 };
                 content: {
                     'application/json': components['schemas']['Clip'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'users___common-followers': {
+        requestBody: {
+            content: {
+                'application/json': ({
+                    /** Format: misskey:id */
+                    userId: string;
+                } | {
+                    username: string;
+                    /** @description The local host is represented with `null`. */
+                    host: string | null;
+                }) & {
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** @default 10 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Following'][];
                 };
             };
             /** @description Client error */

@@ -611,6 +611,8 @@ import type {
 	UsersAchievementsResponse,
 	UsersClipsRequest,
 	UsersClipsResponse,
+	UsersCommonFollowersRequest,
+	UsersCommonFollowersResponse,
 	UsersFeaturedNotesRequest,
 	UsersFeaturedNotesResponse,
 	UsersFlashsRequest,
@@ -1073,6 +1075,7 @@ export type Endpoints = {
 	'users': { req: UsersRequest; res: UsersResponse };
 	'users/achievements': { req: UsersAchievementsRequest; res: UsersAchievementsResponse };
 	'users/clips': { req: UsersClipsRequest; res: UsersClipsResponse };
+	'users/common-followers': { req: UsersCommonFollowersRequest; res: UsersCommonFollowersResponse };
 	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
 	'users/followers': { req: UsersFollowersRequest; res: UsersFollowersResponse };

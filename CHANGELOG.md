@@ -1,3 +1,14 @@
+## Unreleased
+
+### General
+-
+
+### Client
+- Feat: 他ユーザーのフォロワー一覧で共通のフォロワーに絞り込めるように
+
+### Server
+- Feat: 共通のフォロワーを取得する `users/common-followers` APIを追加
+
 ## 2026.6.0
 
 ### General

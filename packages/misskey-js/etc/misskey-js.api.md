@@ -2142,6 +2142,8 @@ declare namespace entities {
         UsersAchievementsResponse,
         UsersClipsRequest,
         UsersClipsResponse,
+        UsersCommonFollowersRequest,
+        UsersCommonFollowersResponse,
         UsersFeaturedNotesRequest,
         UsersFeaturedNotesResponse,
         UsersFlashsRequest,
@@ -3744,6 +3746,12 @@ type UsersClipsRequest = operations['users___clips']['requestBody']['content']['
 
 // @public (undocumented)
 type UsersClipsResponse = operations['users___clips']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type UsersCommonFollowersRequest = operations['users___common-followers']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersCommonFollowersResponse = operations['users___common-followers']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersFeaturedNotesRequest = operations['users___featured-notes']['requestBody']['content']['application/json'];

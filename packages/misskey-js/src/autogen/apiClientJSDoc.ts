@@ -4522,6 +4522,17 @@ declare module '../api.js' {
     ): Promise<SwitchCaseResponseType<E, P>>;
 
     /**
+     * Show users that follow this user and are followed by the current user.
+     * 
+     * **Credential required**: *Yes* / **Permission**: *read:following*
+     */
+    request<E extends 'users/common-followers', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
      * No description provided.
      * 
      * **Credential required**: *No*

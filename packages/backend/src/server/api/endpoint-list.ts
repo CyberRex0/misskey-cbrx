@@ -391,6 +391,7 @@ export * as 'username/available' from './endpoints/username/available.js';
 export * as 'users' from './endpoints/users.js';
 export * as 'users/achievements' from './endpoints/users/achievements.js';
 export * as 'users/clips' from './endpoints/users/clips.js';
+export * as 'users/common-followers' from './endpoints/users/common-followers.js';
 export * as 'users/featured-notes' from './endpoints/users/featured-notes.js';
 export * as 'users/flashs' from './endpoints/users/flashs.js';
 export * as 'users/followers' from './endpoints/users/followers.js';
