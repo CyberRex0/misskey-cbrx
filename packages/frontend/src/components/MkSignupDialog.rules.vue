@@ -4,84 +4,192 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div>
-	<div :class="$style.banner">
-		<i class="ti ti-checklist"></i>
-	</div>
-	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
-		<div class="_gaps_m">
-			<div v-if="instance.disableRegistration || instance.federation !== 'all'" class="_gaps_s">
-				<MkInfo v-if="instance.disableRegistration" warn>{{ i18n.ts.invitationRequiredToRegister }}</MkInfo>
-				<MkInfo v-if="instance.federation === 'specified'" warn>{{ i18n.ts.federationSpecified }}</MkInfo>
-				<MkInfo v-else-if="instance.federation === 'none'" warn>{{ i18n.ts.federationDisabled }}</MkInfo>
-			</div>
-
-			<div style="text-align: center;">
-				<div>{{ i18n.ts.pleaseConfirmBelowBeforeSignup }}</div>
-				<div style="font-weight: bold; margin-top: 0.5em;">{{ i18n.ts.beSureToReadThisAsItIsImportant }}</div>
-			</div>
-
-			<MkFolder v-if="availableServerRules" :defaultOpen="true">
-				<template #label>{{ i18n.ts.serverRules }}</template>
-				<template #suffix><i v-if="agreeServerRules" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
-
-				<ol class="_gaps_s" :class="$style.rules">
-					<li v-for="item in instance.serverRules" :class="$style.rule"><div :class="$style.ruleText" v-html="item"></div></li>
-				</ol>
-
-				<MkSwitch :modelValue="agreeServerRules" style="margin-top: 16px;" @update:modelValue="updateAgreeServerRules">{{ i18n.ts.agree }}</MkSwitch>
-			</MkFolder>
-
-			<MkFolder v-if="availableTos || availablePrivacyPolicy" :defaultOpen="true">
-				<template #label>{{ tosPrivacyPolicyLabel }}</template>
-				<template #suffix><i v-if="agreeTosAndPrivacyPolicy" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
-				<div class="_gaps_s">
-					<div v-if="availableTos"><a :href="instance.tosUrl ?? undefined" class="_link" target="_blank" @click="sT(()=>{agreeTosSwitchDisabled=false}, 1)">{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i></a></div>
-					<div v-if="availablePrivacyPolicy"><a :href="instance.privacyPolicyUrl ?? undefined" class="_link" target="_blank">{{ i18n.ts.privacyPolicy }} <i class="ti ti-external-link"></i></a></div>
+	<div>
+		<div :class="$style.banner">
+			<i class="ti ti-checklist"></i>
+		</div>
+		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px">
+			<div class="_gaps_m">
+				<div
+					v-if="instance.disableRegistration || instance.federation !== 'all'"
+					class="_gaps_s"
+				>
+					<MkInfo v-if="instance.disableRegistration" warn>{{
+						i18n.ts.invitationRequiredToRegister
+					}}</MkInfo>
+					<MkInfo v-if="instance.federation === 'specified'" warn>{{
+						i18n.ts.federationSpecified
+					}}</MkInfo>
+					<MkInfo v-else-if="instance.federation === 'none'" warn>{{
+						i18n.ts.federationDisabled
+					}}</MkInfo>
 				</div>
 
-				<MkSwitch :modelValue="agreeTosAndPrivacyPolicy" style="margin-top: 16px;" :disabled="agreeTosSwitchDisabled" @update:modelValue="updateAgreeTosAndPrivacyPolicy">{{ i18n.ts.agree }}</MkSwitch>
-			</MkFolder>
+				<div style="text-align: center">
+					<div>{{ i18n.ts.pleaseConfirmBelowBeforeSignup }}</div>
+					<div style="font-weight: bold; margin-top: 0.5em">
+						{{ i18n.ts.beSureToReadThisAsItIsImportant }}
+					</div>
+				</div>
 
-			<MkFolder :defaultOpen="true">
-				<template #label>{{ i18n.ts.basicNotesBeforeCreateAccount }}</template>
-				<template #suffix><i v-if="agreeNote" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
+				<MkFolder v-if="availableServerRules" :defaultOpen="true">
+					<template #label>{{ i18n.ts.serverRules }}</template>
+					<template #suffix
+						><i
+							v-if="agreeServerRules"
+							class="ti ti-check"
+							style="color: var(--MI_THEME-success)"
+						></i
+					></template>
 
-				<a href="https://misskey-hub.net/docs/for-users/onboarding/warning/" class="_link" target="_blank" @click="sT(()=>{basicNoteSwitchDisabled=false}, 1)">{{ i18n.ts.basicNotesBeforeCreateAccount }} <i class="ti ti-external-link"></i></a>
+					<ol class="_gaps_s" :class="$style.rules">
+						<li v-for="item in instance.serverRules" :class="$style.rule">
+							<div :class="$style.ruleText" v-html="item"></div>
+						</li>
+					</ol>
 
-				<MkSwitch :modelValue="agreeNote" style="margin-top: 16px;" data-cy-signup-rules-notes-agree :disabled="basicNoteSwitchDisabled" @update:modelValue="updateAgreeNote">{{ i18n.ts.agree }}</MkSwitch>
-			</MkFolder>
+					<MkSwitch
+						:modelValue="agreeServerRules"
+						style="margin-top: 16px"
+						@update:modelValue="updateAgreeServerRules"
+						>{{ i18n.ts.agree }}</MkSwitch
+					>
+				</MkFolder>
 
-			<MkFolder :defaultOpen="true">
-				<template #label>年齢確認</template>
-				<template #suffix><i v-if="iAmAbove13" class="ti ti-check" style="color: var(--success)"></i></template>
-				<MkSwitch :modelValue="iAmAbove13" @update:modelValue="updateiAmAbove13">私は13歳以上です</MkSwitch>
-			</MkFolder>
+				<MkFolder
+					v-if="availableTos || availablePrivacyPolicy"
+					:defaultOpen="true"
+				>
+					<template #label>{{ tosPrivacyPolicyLabel }}</template>
+					<template #suffix
+						><i
+							v-if="agreeTosAndPrivacyPolicy"
+							class="ti ti-check"
+							style="color: var(--MI_THEME-success)"
+						></i
+					></template>
+					<div class="_gaps_s">
+						<div v-if="availableTos">
+							<a
+								:href="instance.tosUrl ?? undefined"
+								class="_link"
+								target="_blank"
+								@click="
+									sT(() => {
+										agreeTosSwitchDisabled = false;
+									}, 1)
+								"
+								>{{ i18n.ts.termsOfService }} <i class="ti ti-external-link"></i
+							></a>
+						</div>
+						<div v-if="availablePrivacyPolicy">
+							<a
+								:href="instance.privacyPolicyUrl ?? undefined"
+								class="_link"
+								target="_blank"
+								>{{ i18n.ts.privacyPolicy }} <i class="ti ti-external-link"></i
+							></a>
+						</div>
+					</div>
 
-			<div v-if="!agreed" style="text-align: center;">{{ i18n.ts.pleaseAgreeAllToContinue }}</div>
+					<MkSwitch
+						:modelValue="agreeTosAndPrivacyPolicy"
+						style="margin-top: 16px"
+						:disabled="agreeTosSwitchDisabled"
+						@update:modelValue="updateAgreeTosAndPrivacyPolicy"
+						>{{ i18n.ts.agree }}</MkSwitch
+					>
+				</MkFolder>
 
-			<div class="_buttonsCenter">
-				<MkButton inline rounded @click="emit('cancel')">{{ i18n.ts.cancel }}</MkButton>
-				<MkButton inline primary rounded gradate :disabled="!agreed" data-cy-signup-rules-continue @click="emit('done')">{{ i18n.ts.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+				<MkFolder :defaultOpen="true">
+					<template #label>{{
+						i18n.ts.basicNotesBeforeCreateAccount
+					}}</template>
+					<template #suffix
+						><i
+							v-if="agreeNote"
+							class="ti ti-check"
+							style="color: var(--MI_THEME-success)"
+						></i
+					></template>
+
+					<a
+						href="https://misskey-hub.net/docs/for-users/onboarding/warning/"
+						class="_link"
+						target="_blank"
+						@click="
+							sT(() => {
+								basicNoteSwitchDisabled = false;
+							}, 1)
+						"
+						>{{ i18n.ts.basicNotesBeforeCreateAccount }}
+						<i class="ti ti-external-link"></i
+					></a>
+
+					<MkSwitch
+						:modelValue="agreeNote"
+						style="margin-top: 16px"
+						data-testid="signup-rules-notes-agree"
+						:disabled="basicNoteSwitchDisabled"
+						@update:modelValue="updateAgreeNote"
+						>{{ i18n.ts.agree }}</MkSwitch
+					>
+				</MkFolder>
+
+				<MkFolder :defaultOpen="true">
+					<template #label>年齢確認</template>
+					<template #suffix
+						><i
+							v-if="iAmAbove13"
+							class="ti ti-check"
+							style="color: var(--success)"
+						></i
+					></template>
+					<MkSwitch
+						:modelValue="iAmAbove13"
+						@update:modelValue="updateiAmAbove13"
+						>私は13歳以上です</MkSwitch
+					>
+				</MkFolder>
+
+				<div v-if="!agreed" style="text-align: center">
+					{{ i18n.ts.pleaseAgreeAllToContinue }}
+				</div>
+
+				<div class="_buttonsCenter">
+					<MkButton inline rounded @click="emit('cancel')">{{
+						i18n.ts.cancel
+					}}</MkButton>
+					<MkButton
+						inline
+						primary
+						rounded
+						gradate
+						:disabled="!agreed"
+						data-testid="signup-rules-continue"
+						@click="emit('done')"
+						>{{ i18n.ts.continue }} <i class="ti ti-arrow-right"></i
+					></MkButton>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import * as os from '@/os.js';
+import { computed, ref } from "vue";
+import { instance } from "@/instance.js";
+import { i18n } from "@/i18n.js";
+import MkButton from "@/components/MkButton.vue";
+import MkFolder from "@/components/MkFolder.vue";
+import MkSwitch from "@/components/MkSwitch.vue";
+import MkInfo from "@/components/MkInfo.vue";
+import * as os from "@/os.js";
 
 const availableServerRules = instance.serverRules.length > 0;
-const availableTos = instance.tosUrl != null && instance.tosUrl !== '';
-const availablePrivacyPolicy = instance.privacyPolicyUrl != null && instance.privacyPolicyUrl !== '';
+const availableTos = instance.tosUrl != null && instance.tosUrl !== "";
+const availablePrivacyPolicy =
+	instance.privacyPolicyUrl != null && instance.privacyPolicyUrl !== "";
 
 const agreeServerRules = ref(false);
 const agreeTosAndPrivacyPolicy = ref(false);
@@ -94,12 +202,18 @@ const agreeTosSwitchDisabled = ref(true);
 const basicNoteSwitchDisabled = ref(true);
 
 const agreed = computed(() => {
-	return (!availableServerRules || agreeServerRules.value) && ((!availableTos && !availablePrivacyPolicy) || agreeTosAndPrivacyPolicy.value) && agreeNote.value && iAmAbove13.value;
+	return (
+		(!availableServerRules || agreeServerRules.value) &&
+		((!availableTos && !availablePrivacyPolicy) ||
+			agreeTosAndPrivacyPolicy.value) &&
+		agreeNote.value &&
+		iAmAbove13.value
+	);
 });
 
 const emit = defineEmits<{
-	(ev: 'cancel'): void;
-	(ev: 'done'): void;
+	(ev: "cancel"): void;
+	(ev: "done"): void;
 }>();
 
 const tosPrivacyPolicyLabel = computed(() => {
@@ -110,14 +224,14 @@ const tosPrivacyPolicyLabel = computed(() => {
 	} else if (availablePrivacyPolicy) {
 		return i18n.ts.privacyPolicy;
 	} else {
-		return '';
+		return "";
 	}
 });
 
 async function updateAgreeServerRules(v: boolean) {
 	if (v) {
 		const confirm = await os.confirm({
-			type: 'question',
+			type: "question",
 			title: i18n.ts.doYouAgree,
 			text: i18n.tsx.iHaveReadXCarefullyAndAgree({ x: i18n.ts.serverRules }),
 		});
@@ -131,7 +245,7 @@ async function updateAgreeServerRules(v: boolean) {
 async function updateAgreeTosAndPrivacyPolicy(v: boolean) {
 	if (v) {
 		const confirm = await os.confirm({
-			type: 'question',
+			type: "question",
 			title: i18n.ts.doYouAgree,
 			text: i18n.tsx.iHaveReadXCarefullyAndAgree({
 				x: tosPrivacyPolicyLabel.value,
@@ -147,9 +261,11 @@ async function updateAgreeTosAndPrivacyPolicy(v: boolean) {
 async function updateAgreeNote(v: boolean) {
 	if (v) {
 		const confirm = await os.confirm({
-			type: 'question',
+			type: "question",
 			title: i18n.ts.doYouAgree,
-			text: i18n.tsx.iHaveReadXCarefullyAndAgree({ x: i18n.ts.basicNotesBeforeCreateAccount }),
+			text: i18n.tsx.iHaveReadXCarefullyAndAgree({
+				x: i18n.ts.basicNotesBeforeCreateAccount,
+			}),
 		});
 		if (confirm.canceled) return;
 		agreeNote.value = true;
@@ -161,8 +277,8 @@ async function updateAgreeNote(v: boolean) {
 async function updateiAmAbove13(v: boolean) {
 	if (v) {
 		const confirm = await os.confirm({
-			type: 'question',
-			title: '本当に13歳以上ですか？',
+			type: "question",
+			title: "本当に13歳以上ですか？",
 			text: `もしあなたが13さいになっていないなら\nこのサイトはつかわないでください。\n<small>13歳未満であると判明した場合は凍結します。</small>`,
 		});
 		if (confirm.canceled) return;
