@@ -34,9 +34,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import type * as Misskey from 'misskey-js';
 import V1Note from './note.vue';
 import V1PostForm from './post-form.vue';
+import type * as Misskey from 'misskey-js';
 import { dateString } from '@/filters/date.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
@@ -128,7 +128,7 @@ definePage(() => ({
 
 .pageHeader {
 	position: sticky;
-	top: 48px;
+	top: 0;
 	z-index: 20;
 	display: grid;
 	grid-template-columns: 48px 1fr 48px;

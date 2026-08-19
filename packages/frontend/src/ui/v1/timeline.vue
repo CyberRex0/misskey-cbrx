@@ -9,20 +9,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<header :class="$style.toolbar">
 		<nav :class="$style.tabs" :aria-label="i18n.ts.timeline">
 			<button
-				v-for="timeline in timelines"
-				:key="timeline"
+				v-for="timelineType in timelines"
+				:key="timelineType"
 				class="_button"
-				:class="[$style.tab, { [$style.active]: src === timeline }]"
-				:aria-pressed="src === timeline"
-				@click="src = timeline"
+				:class="[$style.tab, { [$style.active]: src === timelineType }]"
+				:aria-pressed="src === timelineType"
+				@click="src = timelineType"
 			>
-				<i :class="basicTimelineIconClass(timeline)"></i>
-				<span>{{ i18n.ts._timelines[timeline] }}</span>
+				<i :class="basicTimelineIconClass(timelineType)" aria-hidden="true"></i>
+				<span>{{ i18n.ts._timelines[timelineType] }}</span>
 			</button>
 		</nav>
 		<div :class="$style.actions">
-			<button class="_button" :class="$style.action" :aria-label="i18n.ts.reload" @click="timeline?.reloadTimeline()"><i class="ti ti-refresh"></i></button>
-			<button class="_button" :class="$style.post" @click="os.post()"><i class="ti ti-pencil"></i><span>{{ i18n.ts.note }}</span></button>
+			<button class="_button" :class="$style.action" :aria-label="i18n.ts.reload" @click="timeline?.reloadTimeline()"><i class="ti ti-refresh" aria-hidden="true"></i></button>
+			<button class="_button" :class="$style.post" @click="os.post()"><i class="ti ti-pencil" aria-hidden="true"></i><span>{{ i18n.ts.note }}</span></button>
 		</div>
 	</header>
 
@@ -54,6 +54,10 @@ import { store } from '@/store.js';
 import { availableBasicTimelines, basicTimelineIconClass, isAvailableBasicTimeline, isBasicTimeline } from '@/timelines.js';
 import { deepMerge } from '@/utility/merge.js';
 
+defineOptions({
+	name: 'V1Timeline',
+});
+
 const timeline = useTemplateRef('timeline');
 const timelines = computed(() => availableBasicTimelines());
 const filters = computed(() => store.r.tl.value.filter);
@@ -80,7 +84,7 @@ definePage(() => ({
 
 .toolbar {
 	position: sticky;
-	top: 48px;
+	top: 0;
 	z-index: 20;
 	display: flex;
 	align-items: stretch;

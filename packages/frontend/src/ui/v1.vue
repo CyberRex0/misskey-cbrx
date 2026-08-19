@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<XWidgets place="left" :widgetComponents="v1WidgetComponents"/>
 		</aside>
 
-		<main :class="$style.main" @contextmenu.stop="onContextmenu">
+		<main ref="scrollContainer" :class="[$style.main, { [$style.scrollable]: usesV1ScrollContainer }]" @contextmenu.stop="onContextmenu">
 			<XTimeline v-if="isTimelineRoute"/>
 			<XSearch v-else-if="isSearchRoute" :query="searchQuery"/>
 			<XNotifications v-else-if="isNotificationsRoute"/>
@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, onMounted, onUnmounted, provide, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue';
 import { instanceName } from '@@/js/config.js';
 import { isLink } from '@@/js/is-link.js';
 import XHeader from './v1/header.vue';
@@ -102,9 +102,13 @@ const userFollowRoute = computed(() => getV1UserFollowRoute(currentPath.value));
 const routeSupported = computed(() => {
 	return isV1SupportedPath(currentPath.value);
 });
+const usesV1ScrollContainer = computed(() => {
+	return isTimelineRoute.value || isSearchRoute.value || isNotificationsRoute.value || noteId.value != null || userAcct.value != null || userFollowRoute.value != null || !routeSupported.value;
+});
 
 const pageMetadata = ref<null | PageMetadata>(null);
 const drawerMenuShowing = ref(false);
+const scrollContainer = useTemplateRef<HTMLElement>('scrollContainer');
 
 provide(DI.router, mainRouter);
 provideMetadataReceiver((metadataGetter) => {
@@ -116,6 +120,11 @@ provideReactiveMetadata(pageMetadata);
 
 function onResize() {
 	viewportWidth.value = window.innerWidth;
+}
+
+function scrollToTop(behavior: ScrollBehavior = 'instant') {
+	if (!usesV1ScrollContainer.value) return;
+	scrollContainer.value?.scrollTo({ top: 0, behavior });
 }
 
 function onContextmenu(ev: PointerEvent) {
@@ -137,6 +146,14 @@ function onContextmenu(ev: PointerEvent) {
 
 watch(isMobile, (mobile) => {
 	if (!mobile) drawerMenuShowing.value = false;
+});
+
+mainRouter.useListener('change', () => {
+	void nextTick(() => scrollToTop());
+});
+
+mainRouter.useListener('same', () => {
+	scrollToTop('smooth');
 });
 
 onMounted(() => window.addEventListener('resize', onResize, { passive: true }));
@@ -171,13 +188,20 @@ onUnmounted(() => window.removeEventListener('resize', onResize));
 	--MI_THEME-inputBorder: var(--v1-divider);
 	--MI_THEME-buttonBg: var(--v1-subtleBg);
 
-	min-height: 100dvh;
+	box-sizing: border-box;
+	height: 100dvh;
+	overflow: clip;
+	display: flex;
+	flex-direction: column;
 	color: var(--v1-fg);
 	background: var(--v1-bg);
 }
 
 .layout {
 	display: flex;
+	flex: 1;
+	min-height: 0;
+	overflow: clip;
 	justify-content: center;
 	width: 100%;
 	max-width: 1300px;
@@ -188,17 +212,26 @@ onUnmounted(() => window.removeEventListener('resize', onResize));
 	box-sizing: border-box;
 	container-type: inline-size;
 	width: min(100%, 750px);
+	height: 100%;
 	min-width: 0;
-	min-height: calc(100dvh - 48px);
+	min-height: 0;
+	overflow: clip;
 	background: var(--v1-bg);
 	border-right: solid 1px var(--v1-divider);
 	border-left: solid 1px var(--v1-divider);
 	--MI-margin: 12px;
 }
 
+.scrollable {
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
 .widgets {
 	box-sizing: border-box;
 	width: 300px;
+	height: 100%;
+	overflow-y: auto;
 	padding: 16px 0 16px 16px;
 }
 
@@ -212,7 +245,8 @@ onUnmounted(() => window.removeEventListener('resize', onResize));
 
 	.main {
 		width: 100%;
-		min-height: calc(100dvh - 48px);
+		height: 100%;
+		min-height: 0;
 		border: 0;
 	}
 }

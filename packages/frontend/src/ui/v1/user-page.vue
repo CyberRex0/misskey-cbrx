@@ -125,7 +125,7 @@ definePage(() => ({
 
 .tabs {
 	position: sticky;
-	top: 48px;
+	top: 0;
 	z-index: 20;
 	display: flex;
 	height: 46px;
