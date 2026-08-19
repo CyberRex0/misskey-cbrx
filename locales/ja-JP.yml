@@ -937,6 +937,7 @@ manageAccounts: "アカウントを管理"
 makeReactionsPublic: "リアクション一覧を公開する"
 makeReactionsPublicDescription: "あなたがしたリアクション一覧を誰でも見れるようにします。"
 classic: "クラシック"
+v1Ui: "Misskey v1"
 muteThread: "スレッドをミュート"
 unmuteThread: "スレッドのミュートを解除"
 followingVisibility: "フォローの公開範囲"
@@ -3161,6 +3162,14 @@ _hemisphere:
   N: "北半球"
   S: "南半球"
   caption: "一部のクライアント設定で、季節を判定するために使用します。"
+
+_v1Ui:
+  unsupportedTitle: "このページはMisskey v1 UIに対応していません"
+  unsupportedDescription: "Misskey v1の当時に存在しなかった機能です。標準UIへ切り替えると、このURLをそのまま開くことができます。"
+  openInDefaultUi: "標準UIで開く"
+  unreadLabel: "{label}（未読）"
+  unreadCountLabel: "{label}（未読{count}件）"
+  conversation: "会話"
 
 _reversi:
   reversi: "リバーシ"

@@ -4,16 +4,12 @@
  */
 
 import { computed, reactive } from 'vue';
-import { ui } from '@@/js/config.js';
 import { clearCache } from './utility/clear-cache.js';
 import type { ComputedRef } from 'vue';
 import { $i } from '@/i.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { openInstanceMenu, openToolsMenu } from '@/ui/_common_/common.js';
+import { openInstanceMenu, openToolsMenu, openUiSwitchMenu } from '@/ui/_common_/common.js';
 import { lookup } from '@/utility/lookup.js';
-import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { unisonReload } from '@/utility/unison-reload.js';
 
 export const navbarItemDef = reactive<{
 	[key: string]: {
@@ -73,7 +69,7 @@ export const navbarItemDef = reactive<{
 	lookup: {
 		title: i18n.ts.lookup,
 		icon: 'ti ti-world-search',
-		action: (ev) => {
+		action: (_ev) => {
 			lookup();
 		},
 	},
@@ -149,21 +145,7 @@ export const navbarItemDef = reactive<{
 		title: i18n.ts.switchUi,
 		icon: 'ti ti-devices',
 		action: (ev) => {
-			os.popupMenu([{
-				text: i18n.ts.default,
-				active: ui === 'default' || ui === null,
-				action: () => {
-					miLocalStorage.setItem('ui', 'default');
-					unisonReload();
-				},
-			}, {
-				text: i18n.ts.deck,
-				active: ui === 'deck',
-				action: () => {
-					miLocalStorage.setItem('ui', 'deck');
-					unisonReload();
-				},
-			}], ev.currentTarget ?? ev.target);
+			openUiSwitchMenu(ev);
 		},
 	},
 	about: {
@@ -183,7 +165,7 @@ export const navbarItemDef = reactive<{
 	reload: {
 		title: i18n.ts.reload,
 		icon: 'ti ti-refresh',
-		action: (ev) => {
+		action: (_ev) => {
 			window.location.reload();
 		},
 	},
@@ -196,7 +178,7 @@ export const navbarItemDef = reactive<{
 	cacheClear: {
 		title: i18n.ts.clearCache,
 		icon: 'ti ti-trash',
-		action: (ev) => {
+		action: (_ev) => {
 			clearCache();
 		},
 	},

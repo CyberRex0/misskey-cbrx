@@ -8,6 +8,7 @@ import { ui } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
 import { compareVersions } from 'compare-versions';
 import { common } from './common.js';
+import { resolveUiStyle } from './ui-style.js';
 import type { Component } from 'vue';
 import type { Keymap } from '@/utility/hotkey.js';
 import { i18n } from '@/i18n.js';
@@ -32,15 +33,14 @@ import { isBirthday } from '@/utility/is-birthday.js';
 
 export async function mainBoot() {
 	const { isClientUpdated, lastVersion } = await common(async () => {
-		let uiStyle = ui;
 		const searchParams = new URLSearchParams(window.location.search);
-
-		if (!$i) uiStyle = 'visitor';
-
-		if (searchParams.has('zen')) uiStyle = 'zen';
-		if (uiStyle === 'deck' && prefer.s['deck.useSimpleUiForNonRootPages'] && window.location.pathname !== '/') uiStyle = 'zen';
-
-		if (searchParams.has('ui')) uiStyle = searchParams.get('ui');
+		const uiStyle = resolveUiStyle({
+			storedUiStyle: ui,
+			isSignedIn: $i != null,
+			searchParams,
+			pathname: window.location.pathname,
+			useSimpleDeckUiForNonRootPages: prefer.s['deck.useSimpleUiForNonRootPages'],
+		});
 
 		let rootComponent: Component;
 		switch (uiStyle) {
@@ -49,6 +49,9 @@ export async function mainBoot() {
 				break;
 			case 'deck':
 				rootComponent = await import('@/ui/deck.vue').then(x => x.default);
+				break;
+			case 'v1':
+				rootComponent = await import('@/ui/v1.vue').then(x => x.default);
 				break;
 			case 'visitor':
 				rootComponent = await import('@/ui/visitor.vue').then(x => x.default);

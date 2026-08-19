@@ -29,8 +29,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
 					<span>{{ getSeparatorInfo(paginator.items.value[i -1].createdAt, notification.createdAt)?.nextText }} <i class="ti ti-chevron-down"></i></span>
 				</div>
-				<MkNote v-if="['reply', 'quote', 'mention'].includes(notification.type) && 'note' in notification" :class="$style.content" :note="notification.note" :withHardMute="true"/>
-				<XNotification v-else :class="$style.content" :notification="notification" :withTime="true" :full="true"/>
+				<component :is="noteComponent" v-if="['reply', 'quote', 'mention'].includes(notification.type) && 'note' in notification" :class="$style.content" :note="notification.note" :withHardMute="true"/>
+				<component :is="notificationComponent" v-else :class="$style.content" :notification="notification" :withTime="true" :full="true"/>
 			</div>
 		</component>
 		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
@@ -48,6 +48,7 @@ import { notificationTypes } from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
+import type { Component } from 'vue';
 import XNotification from '@/components/MkNotification.vue';
 import MkNote from '@/components/MkNote.vue';
 import { useStream } from '@/stream.js';
@@ -58,9 +59,18 @@ import { store } from '@/store.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
 import { Paginator } from '@/utility/paginator.js';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	excludeTypes?: typeof notificationTypes[number][] | null;
-}>();
+	notificationComponent?: Component;
+	noteComponent?: Component;
+}>(), {
+	excludeTypes: null,
+	notificationComponent: () => XNotification,
+	noteComponent: () => MkNote,
+});
+
+const notificationComponent = computed(() => props.notificationComponent);
+const noteComponent = computed(() => props.noteComponent);
 
 const rootEl = useTemplateRef('rootEl');
 
@@ -104,7 +114,7 @@ function isTop() {
 
 function releaseQueue() {
 	paginator.releaseQueue();
-	scrollToTop(rootEl.value!);
+	if (rootEl.value != null) scrollToTop(rootEl.value);
 }
 
 let scrollContainer: HTMLElement | null = null;

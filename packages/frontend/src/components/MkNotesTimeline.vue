@@ -20,18 +20,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
 						<span>{{ getSeparatorInfo(paginator.items.value[i - 1].createdAt, note.createdAt)?.nextText }} <i class="ti ti-chevron-down"></i></span>
 					</div>
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<component :is="noteComponent" :class="$style.note" :note="note" :withHardMute="true"/>
 					<div v-if="note._shouldInsertAd_" :class="$style.ad">
 						<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 					</div>
 				</div>
 				<div v-else-if="note._shouldInsertAd_" :class="{ '_gaps': !noGap }" :data-scroll-anchor="note.id">
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<component :is="noteComponent" :class="$style.note" :note="note" :withHardMute="true"/>
 					<div :class="$style.ad">
 						<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 					</div>
 				</div>
-				<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+				<component :is="noteComponent" v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
 		</div>
 	</template>
@@ -40,6 +40,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup generic="T extends IPaginator<Misskey.entities.Note>">
 import * as Misskey from 'misskey-js';
+import { computed } from 'vue';
+import type { Component } from 'vue';
 import type { MkPaginationOptions } from '@/components/MkPagination.vue';
 import type { IPaginator } from '@/utility/paginator.js';
 import MkNote from '@/components/MkNote.vue';
@@ -51,13 +53,17 @@ import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-sep
 const props = withDefaults(defineProps<MkPaginationOptions & {
 	paginator: T;
 	noGap?: boolean;
+	noteComponent?: Component;
 }>(), {
 	autoLoad: true,
 	direction: 'down',
 	pullToRefresh: true,
 	withControl: true,
 	forceDisableInfiniteScroll: false,
+	noteComponent: () => MkNote,
 });
+
+const noteComponent = computed(() => props.noteComponent ?? MkNote);
 
 useGlobalEvent('noteDeleted', (noteId) => {
 	props.paginator.removeItem(noteId);

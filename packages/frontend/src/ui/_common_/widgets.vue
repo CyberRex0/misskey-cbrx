@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<XWidgets
 		:edit="editMode"
 		:widgets="widgets"
+		:widgetComponents="widgetComponents"
 		@addWidget="addWidget"
 		@removeWidget="removeWidget"
 		@updateWidget="updateWidget"
@@ -27,6 +28,7 @@ const editMode = ref(false);
 
 <script lang="ts" setup>
 import type { DefaultStoredWidget, Widget } from '@/components/MkWidgets.vue';
+import type { Component } from 'vue';
 import XWidgets from '@/components/MkWidgets.vue';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
@@ -36,8 +38,10 @@ const props = withDefaults(defineProps<{
 	// left = place: leftだけを表示
 	// right = rightとnullを表示
 	place?: 'left' | null | 'right';
+	widgetComponents?: Readonly<Record<string, Component>>;
 }>(), {
 	place: null,
+	widgetComponents: undefined,
 });
 
 const widgets = computed(() => {

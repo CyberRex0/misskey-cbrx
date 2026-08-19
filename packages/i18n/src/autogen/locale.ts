@@ -3761,6 +3761,10 @@ export interface Locale extends ILocale {
      */
     "classic": string;
     /**
+     * Misskey v1
+     */
+    "v1Ui": string;
+    /**
      * スレッドをミュート
      */
     "muteThread": string;
@@ -11884,6 +11888,32 @@ export interface Locale extends ILocale {
          * 一部のクライアント設定で、季節を判定するために使用します。
          */
         "caption": string;
+    };
+    "_v1Ui": {
+        /**
+         * このページはMisskey v1 UIに対応していません
+         */
+        "unsupportedTitle": string;
+        /**
+         * Misskey v1の当時に存在しなかった機能です。標準UIへ切り替えると、このURLをそのまま開くことができます。
+         */
+        "unsupportedDescription": string;
+        /**
+         * 標準UIで開く
+         */
+        "openInDefaultUi": string;
+        /**
+         * {label}（未読）
+         */
+        "unreadLabel": ParameterizedString<"label">;
+        /**
+         * {label}（未読{count}件）
+         */
+        "unreadCountLabel": ParameterizedString<"label" | "count">;
+        /**
+         * 会話
+         */
+        "conversation": string;
     };
     "_reversi": {
         /**

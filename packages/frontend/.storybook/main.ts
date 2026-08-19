@@ -53,13 +53,6 @@ const config = {
 					name: 'fake-turbosnap',
 				},
 			],
-			build: {
-				target: [
-					'chrome108',
-					'firefox109',
-					'safari16',
-				],
-			},
 		});
 	},
 } satisfies StorybookConfig;

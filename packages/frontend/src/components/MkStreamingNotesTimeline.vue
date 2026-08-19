@@ -36,15 +36,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
 						<span>{{ getSeparatorInfo(paginator.items.value[i -1].createdAt, note.createdAt)?.nextText }} <i class="ti ti-chevron-down"></i></span>
 					</div>
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<component :is="noteComponent" :class="$style.note" :note="note" :withHardMute="true"/>
 				</div>
 				<div v-else-if="note._shouldInsertAd_" :data-scroll-anchor="note.id">
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<component :is="noteComponent" :class="$style.note" :note="note" :withHardMute="true"/>
 					<div :class="$style.ad">
 						<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 					</div>
 				</div>
-				<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+				<component :is="noteComponent" v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
 		</component>
 		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
@@ -57,6 +57,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted, shallowRef, ref, markRaw } from 'vue';
+import type { Component } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
@@ -91,6 +92,7 @@ const props = withDefaults(defineProps<{
 	withReplies?: boolean;
 	withSensitive?: boolean;
 	onlyFiles?: boolean;
+	noteComponent?: Component;
 }>(), {
 	withRenotes: true,
 	withReplies: false,
@@ -99,6 +101,8 @@ const props = withDefaults(defineProps<{
 	sound: false,
 	customSound: null,
 });
+
+const noteComponent = computed(() => props.noteComponent ?? MkNote);
 
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));

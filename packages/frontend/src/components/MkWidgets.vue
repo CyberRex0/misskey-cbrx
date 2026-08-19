@@ -24,12 +24,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="[$style.widget, $style.customizeContainer]" data-testid="customize-container">
 					<button :class="$style.customizeContainerConfig" class="_button" @click.prevent.stop="configWidget(item.id)"><i class="ti ti-settings"></i></button>
 					<button :class="$style.customizeContainerRemove" data-testid="customize-container-remove" class="_button" @click.prevent.stop="removeWidget(item)"><i class="ti ti-x"></i></button>
-					<component :is="`widget-${item.name}`" :ref="(el: any) => widgetRefs[item.id] = el" :class="$style.customizeContainerHandleWidget" :widget="item" @updateProps="updateWidget(item.id, $event)"/>
+					<component :is="props.widgetComponents?.[item.name] ?? `widget-${item.name}`" :ref="(el: any) => widgetRefs[item.id] = el" :class="$style.customizeContainerHandleWidget" :widget="item" @updateProps="updateWidget(item.id, $event)"/>
 				</div>
 			</template>
 		</MkDraggable>
 	</template>
-	<component :is="`widget-${widget.name}`" v-for="widget in _widgets" v-else :key="widget.id" :ref="(el: any) => widgetRefs[widget.id] = el" :class="$style.widget" :widget="widget" @updateProps="updateWidget(widget.id, $event)" @contextmenu.stop="onContextmenu(widget, $event)"/>
+	<component :is="props.widgetComponents?.[widget.name] ?? `widget-${widget.name}`" v-for="widget in _widgets" v-else :key="widget.id" :ref="(el: any) => widgetRefs[widget.id] = el" :class="$style.widget" :widget="widget" @updateProps="updateWidget(widget.id, $event)" @contextmenu.stop="onContextmenu(widget, $event)"/>
 </div>
 </template>
 
@@ -61,6 +61,7 @@ import { useMkSelect } from '@/composables/use-mkselect.js';
 const props = defineProps<{
 	widgets: Widget[];
 	edit: boolean;
+	widgetComponents?: Readonly<Record<string, Component>>;
 }>();
 
 const _widgetDefs = computed(() => {

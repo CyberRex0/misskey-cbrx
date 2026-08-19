@@ -3,13 +3,39 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent } from 'vue';
-import { host } from '@@/js/config.js';
+import { host, ui } from '@@/js/config.js';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
+import { miLocalStorage } from '@/local-storage.js';
+import { unisonReload } from '@/utility/unison-reload.js';
+
+export function openUiSwitchMenu(ev: PointerEvent) {
+	os.popupMenu([{
+		text: i18n.ts.default,
+		active: ui === 'default' || ui === null,
+		action: () => {
+			miLocalStorage.setItem('ui', 'default');
+			unisonReload();
+		},
+	}, {
+		text: i18n.ts.deck,
+		active: ui === 'deck',
+		action: () => {
+			miLocalStorage.setItem('ui', 'deck');
+			unisonReload();
+		},
+	}, {
+		text: i18n.ts.v1Ui,
+		active: ui === 'v1',
+		action: () => {
+			miLocalStorage.setItem('ui', 'v1');
+			unisonReload();
+		},
+	}], ev.currentTarget ?? ev.target);
+}
 
 function toolsMenuItems(): MenuItem[] {
 	const items: MenuItem[] = [{

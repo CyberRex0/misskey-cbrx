@@ -467,7 +467,10 @@ function toStories(component: string): Promise<string> {
 		globSync('src/pages/admin/overview.ap-requests.vue'),
 		globSync('src/pages/user/home.vue'),
 		globSync('src/pages/search.vue'),
-	].flat();
+		globSync('src/ui/v1/note.vue'),
+		globSync('src/ui/v1/notification.vue'),
+		globSync('src/ui/v1/user-card.vue'),
+	].flat().map(component => component.replaceAll('\\', '/'));
 	await Promise.all(components.map(async (component) => {
 		const stories = component.replace(/\.vue$/, '.stories.ts');
 		await writeFile(stories, await toStories(component));
