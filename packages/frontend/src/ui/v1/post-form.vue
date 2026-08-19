@@ -10,9 +10,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import type { PostFormProps } from '@/types/post-form.js';
 import MkPostForm from '@/components/MkPostForm.vue';
 import { i18n } from '@/i18n.js';
-import type { PostFormProps } from '@/types/post-form.js';
 
 const props = defineProps<PostFormProps>();
 const emit = defineEmits<{
@@ -44,9 +44,7 @@ const emit = defineEmits<{
 		font-size: 14px;
 	}
 
-	button:focus-visible,
-	textarea:focus-visible,
-	input:focus-visible {
+	button:focus-visible {
 		outline: solid 2px var(--MI_THEME-focus);
 		outline-offset: -2px;
 	}

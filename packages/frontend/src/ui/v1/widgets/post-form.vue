@@ -77,9 +77,7 @@ defineExpose<WidgetComponentExpose>({
 		font-size: 14px;
 	}
 
-	button:focus-visible,
-	textarea:focus-visible,
-	input:focus-visible {
+	button:focus-visible {
 		outline: solid 2px var(--MI_THEME-focus);
 		outline-offset: -2px;
 	}
