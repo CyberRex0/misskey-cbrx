@@ -1108,6 +1108,32 @@ export interface Locale extends ILocale {
      * セキュリティ
      */
     "security": string;
+    "_autoFollowBlock": {
+        /**
+         * 自動フォローブロック
+         */
+        "title": string;
+        /**
+         * アカウント作成後の期間
+         */
+        "threshold": string;
+        /**
+         * 単位
+         */
+        "unit": string;
+        /**
+         * 週間
+         */
+        "weeks": string;
+        /**
+         * 日
+         */
+        "days": string;
+        /**
+         * 時間
+         */
+        "hours": string;
+    };
     /**
      * 入力が一致しません。
      */

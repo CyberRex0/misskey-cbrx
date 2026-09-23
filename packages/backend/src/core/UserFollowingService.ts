@@ -160,6 +160,21 @@ export class UserFollowingService implements OnModuleInit {
 			}
 		}
 
+		if (this.userEntityService.isLocalUser(followee) && this.meta.enableAutoFollowBlock) {
+			const followRequestExists = await this.followRequestsRepository.exists({
+				where: {
+					followerId: follower.id,
+					followeeId: followee.id,
+				},
+			});
+			if (followRequestExists) return;
+
+			if (this.isWithinAutoFollowBlockPeriod(follower)) {
+				await this.createFollowRequest(follower, followee, requestId, withReplies);
+				return;
+			}
+		}
+
 		const followeeProfile = await this.userProfilesRepository.findOneByOrFail({ userId: followee.id });
 		// フォロー対象が鍵アカウントである or
 		// フォロワーがBotであり、フォロー対象がBotからのフォローに慎重である or
@@ -222,6 +237,18 @@ export class UserFollowingService implements OnModuleInit {
 		if (this.userEntityService.isRemoteUser(follower) && this.userEntityService.isLocalUser(followee)) {
 			this.deliverAccept(follower, followee, requestId);
 		}
+	}
+
+	@bindThis
+	private isWithinAutoFollowBlockPeriod(follower: MiUser): boolean {
+		const millisecondsPerUnit = {
+			hour: 1000 * 60 * 60,
+			day: 1000 * 60 * 60 * 24,
+			week: 1000 * 60 * 60 * 24 * 7,
+		} satisfies Record<MiMeta['autoFollowBlockUnit'], number>;
+		const threshold = this.meta.autoFollowBlockThreshold * millisecondsPerUnit[this.meta.autoFollowBlockUnit];
+
+		return Date.now() - this.idService.parse(follower.id).date.getTime() < threshold;
 	}
 
 	@bindThis

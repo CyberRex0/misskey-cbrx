@@ -339,6 +339,19 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			enableAutoFollowBlock: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			autoFollowBlockThreshold: {
+				type: 'integer',
+				optional: false, nullable: false,
+			},
+			autoFollowBlockUnit: {
+				type: 'string',
+				enum: ['hour', 'day', 'week'],
+				optional: false, nullable: false,
+			},
 			enableActiveEmailValidation: {
 				type: 'boolean',
 				optional: false, nullable: false,
@@ -738,6 +751,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				deeplAuthKey: instance.deeplAuthKey,
 				deeplIsPro: instance.deeplIsPro,
 				enableIpLogging: instance.enableIpLogging,
+				enableAutoFollowBlock: instance.enableAutoFollowBlock,
+				autoFollowBlockThreshold: instance.autoFollowBlockThreshold,
+				autoFollowBlockUnit: instance.autoFollowBlockUnit,
 				enableActiveEmailValidation: instance.enableActiveEmailValidation,
 				enableVerifymailApi: instance.enableVerifymailApi,
 				verifymailAuthKey: instance.verifymailAuthKey,

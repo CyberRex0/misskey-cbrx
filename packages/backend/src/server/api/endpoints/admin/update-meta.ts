@@ -141,6 +141,9 @@ export const paramDef = {
 		objectStorageSetPublicRead: { type: 'boolean' },
 		objectStorageS3ForcePathStyle: { type: 'boolean' },
 		enableIpLogging: { type: 'boolean' },
+		enableAutoFollowBlock: { type: 'boolean' },
+		autoFollowBlockThreshold: { type: 'integer', minimum: 1, maximum: 99 },
+		autoFollowBlockUnit: { type: 'string', enum: ['hour', 'day', 'week'] },
 		enableActiveEmailValidation: { type: 'boolean' },
 		enableVerifymailApi: { type: 'boolean' },
 		verifymailAuthKey: { type: 'string', nullable: true },
@@ -604,6 +607,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.enableIpLogging !== undefined) {
 				set.enableIpLogging = ps.enableIpLogging;
+			}
+
+			if (ps.enableAutoFollowBlock !== undefined) {
+				set.enableAutoFollowBlock = ps.enableAutoFollowBlock;
+			}
+
+			if (ps.autoFollowBlockThreshold !== undefined) {
+				set.autoFollowBlockThreshold = ps.autoFollowBlockThreshold;
+			}
+
+			if (ps.autoFollowBlockUnit !== undefined) {
+				set.autoFollowBlockUnit = ps.autoFollowBlockUnit;
 			}
 
 			if (ps.enableActiveEmailValidation !== undefined) {

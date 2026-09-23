@@ -9510,6 +9510,10 @@ export interface operations {
                         objectStorageUseProxy: boolean;
                         objectStorageSetPublicRead: boolean;
                         enableIpLogging: boolean;
+                        enableAutoFollowBlock: boolean;
+                        autoFollowBlockThreshold: number;
+                        /** @enum {string} */
+                        autoFollowBlockUnit: 'hour' | 'day' | 'week';
                         enableActiveEmailValidation: boolean;
                         enableVerifymailApi: boolean;
                         verifymailAuthKey: string | null;
@@ -13051,6 +13055,10 @@ export interface operations {
                     objectStorageSetPublicRead?: boolean;
                     objectStorageS3ForcePathStyle?: boolean;
                     enableIpLogging?: boolean;
+                    enableAutoFollowBlock?: boolean;
+                    autoFollowBlockThreshold?: number;
+                    /** @enum {string} */
+                    autoFollowBlockUnit?: 'hour' | 'day' | 'week';
                     enableActiveEmailValidation?: boolean;
                     enableVerifymailApi?: boolean;
                     verifymailAuthKey?: string | null;

@@ -507,6 +507,22 @@ export class MiMeta {
 	public enableIpLogging: boolean;
 
 	@Column('boolean', {
+		default: false,
+	})
+	public enableAutoFollowBlock: boolean;
+
+	@Column('integer', {
+		default: 1,
+	})
+	public autoFollowBlockThreshold: number;
+
+	@Column('varchar', {
+		length: 16,
+		default: 'day',
+	})
+	public autoFollowBlockUnit: 'hour' | 'day' | 'week';
+
+	@Column('boolean', {
 		default: true,
 	})
 	public enableActiveEmailValidation: boolean;

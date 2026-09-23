@@ -10,6 +10,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_m">
 				<XBotProtection/>
 
+				<SearchMarker v-slot="slotProps" :keywords="['follow', 'block', 'security']">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #icon><SearchIcon><i class="ti ti-user-shield"></i></SearchIcon></template>
+						<template #label><SearchLabel>{{ i18n.ts._autoFollowBlock.title }}</SearchLabel></template>
+						<template v-if="autoFollowBlockForm.savedState.enableAutoFollowBlock" #suffix>{{ i18n.ts.enabled }}</template>
+						<template v-else #suffix>{{ i18n.ts.disabled }}</template>
+						<template v-if="autoFollowBlockForm.modified.value" #footer>
+							<MkFormFooter :form="autoFollowBlockForm" :canSaving="canSaveAutoFollowBlock"/>
+						</template>
+
+						<div class="_gaps_m">
+							<SearchMarker>
+								<MkSwitch v-model="autoFollowBlockForm.state.enableAutoFollowBlock">
+									<template #label><SearchLabel>{{ i18n.ts.enable }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<FormSplit :minWidth="140">
+								<SearchMarker :keywords="['account', 'age', 'threshold']">
+									<MkInput v-model="autoFollowBlockForm.state.autoFollowBlockThreshold" type="number" :min="1" :max="99" :step="1" :disabled="!autoFollowBlockForm.state.enableAutoFollowBlock">
+										<template #label><SearchLabel>{{ i18n.ts._autoFollowBlock.threshold }}</SearchLabel></template>
+									</MkInput>
+								</SearchMarker>
+								<SearchMarker :keywords="['unit', 'week', 'day', 'hour']">
+									<MkSelect v-model="autoFollowBlockForm.state.autoFollowBlockUnit" :items="autoFollowBlockUnitItems" :disabled="!autoFollowBlockForm.state.enableAutoFollowBlock">
+										<template #label><SearchLabel>{{ i18n.ts._autoFollowBlock.unit }}</SearchLabel></template>
+									</MkSelect>
+								</SearchMarker>
+							</FormSplit>
+						</div>
+					</MkFolder>
+				</SearchMarker>
+
 				<SearchMarker v-slot="slotProps" :keywords="['sensitive', 'media', 'detection']">
 					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
 						<template #icon><SearchIcon><i class="ti ti-eye-off"></i></SearchIcon></template>
@@ -193,15 +226,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import XBotProtection from './bot-protection.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkRange from '@/components/MkRange.vue';
 import MkInput from '@/components/MkInput.vue';
+import MkSelect from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@/components/MkSelect.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
+import FormSplit from '@/components/form/split.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
@@ -211,6 +247,30 @@ import { useForm } from '@/composables/use-form.js';
 import MkFormFooter from '@/components/MkFormFooter.vue';
 
 const meta = await misskeyApi('admin/meta');
+
+const autoFollowBlockUnitItems = [
+	{ value: 'week', label: i18n.ts._autoFollowBlock.weeks },
+	{ value: 'day', label: i18n.ts._autoFollowBlock.days },
+	{ value: 'hour', label: i18n.ts._autoFollowBlock.hours },
+] satisfies MkSelectItem[];
+
+const autoFollowBlockForm = useForm({
+	enableAutoFollowBlock: meta.enableAutoFollowBlock,
+	autoFollowBlockThreshold: meta.autoFollowBlockThreshold,
+	autoFollowBlockUnit: meta.autoFollowBlockUnit,
+}, async (state) => {
+	await os.apiWithDialog('admin/update-meta', {
+		enableAutoFollowBlock: state.enableAutoFollowBlock,
+		autoFollowBlockThreshold: state.autoFollowBlockThreshold,
+		autoFollowBlockUnit: state.autoFollowBlockUnit,
+	});
+	fetchInstance(true);
+});
+
+const canSaveAutoFollowBlock = computed(() => {
+	const threshold = autoFollowBlockForm.state.autoFollowBlockThreshold;
+	return Number.isInteger(threshold) && threshold >= 1 && threshold <= 99;
+});
 
 const sensitiveMediaDetectionForm = useForm({
 	sensitiveMediaDetection: meta.sensitiveMediaDetection,
